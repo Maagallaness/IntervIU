@@ -1,0 +1,16 @@
+{
+  "watch": [
+    "server.js",
+    "routes/*.js",
+    "prisma/schema.prisma"
+  ],
+  "ext": "js,json,prisma",
+  "ignore": [
+    "node_modules",
+    "*.test.js"
+  ],
+  "verbose": true,
+  "env": {
+    "NODE_ENV": "development"
+  }
+}

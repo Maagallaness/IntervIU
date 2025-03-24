@@ -1,13 +1,17 @@
-# IntervIU
-## Installation
-Testing Tools
-# Backend (BE) Tools
+# IntervIU To Implement
+Backend (BE) Tools
+Database Tools
+Authentication (AUTH)
+Frontend Tools
+Other Essentials
+
+### Backend (BE) Tools
 1. **Framework**:  
    - **Node.js + Express.js** (lightweight, JavaScript, large ecosystem).  
    - Alternative: **Python + Django** (batteries-included, great for rapid prototyping).  
 
 2. **API Testing**:  
-   - **Postman** (free tier) or **Insomnia** (open-source) for testing endpoints.  
+   - **Postman** & ** Insomnia**
 
 3. **Local Development**:  
    - **Nodemon** (auto-reload server during development).  
@@ -26,6 +30,7 @@ Testing Tools
    - For SQL: **Prisma** (TypeScript-friendly) or **Sequelize**.  
    - For MongoDB: **Mongoose**.  
 
+4. MongoDB & Prisma Implemented 
 ---
 
 ### **Authentication (AUTH)**  
@@ -76,7 +81,7 @@ From your screenshots:
 - Ensure consistency in buttons (**"Comenzar ahora"** vs. **"Conectar ahora"**).  
 
 ---
-
+## Installation
 ### **Local Setup Example**  
 For a Node.js/React stack:  
 ```bash
@@ -91,5 +96,3 @@ npx create-vite@latest intervui-frontend --template react
 cd intervui-frontend
 npm install react-router-dom axios
 ```
-
-Start with a simple REST API and build the UI around your wireframes. Use `localhost` for testing!

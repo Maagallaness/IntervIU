@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Interview = require('../models/Interview');
+const { PrismaClient } = require('@prisma/client');
+const { withAccelerate } = require('@prisma/extension-accelerate');
+
+const prisma = new PrismaClient().$extends(withAccelerate());
 
 // Middleware to protect routes
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization').replace('Bearer ', '');
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id }
+    });
     
     if (!user) {
       throw new Error();
@@ -26,16 +30,27 @@ const auth = async (req, res, next) => {
 // Create a new interview request (recruiter only)
 router.post('/', auth, async (req, res) => {
   try {
-    if (req.user.role !== 'recruiter' && req.user.role !== 'admin') {
+    if (req.user.role !== 'RECRUITER' && req.user.role !== 'ADMIN') {
       return res.status(403).json({ message: 'Not authorized' });
     }
     
-    const interview = new Interview({
-      ...req.body,
-      recruiter: req.user._id
+    const interview = await prisma.interview.create({
+      data: {
+        title: req.body.title,
+        description: req.body.description,
+        candidateName: req.body.candidateName,
+        candidateEmail: req.body.candidateEmail,
+        candidateResume: req.body.candidateResume,
+        skills: req.body.skills || [],
+        status: 'PENDING',
+        scheduledDate: req.body.scheduledDate,
+        duration: req.body.duration || 60,
+        recruiter: {
+          connect: { id: req.user.id }
+        }
+      }
     });
     
-    await interview.save();
     res.status(201).json(interview);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -48,15 +63,26 @@ router.get('/', auth, async (req, res) => {
     let interviews;
     
     // Filter interviews based on user role
-    if (req.user.role === 'admin') {
+    if (req.user.role === 'ADMIN') {
       // Admins can see all interviews
-      interviews = await Interview.find().populate('recruiter').populate('interviewer');
-    } else if (req.user.role === 'recruiter') {
+      interviews = await prisma.interview.findMany({
+        include: {
+          recruiter: true,
+          interviewer: true
+        }
+      });
+    } else if (req.user.role === 'RECRUITER') {
       // Recruiters can see their own interviews
-      interviews = await Interview.find({ recruiter: req.user._id }).populate('interviewer');
-    } else if (req.user.role === 'interviewer') {
+      interviews = await prisma.interview.findMany({
+        where: { recruiterId: req.user.id },
+        include: { interviewer: true }
+      });
+    } else if (req.user.role === 'INTERVIEWER') {
       // Interviewers can see interviews assigned to them
-      interviews = await Interview.find({ interviewer: req.user._id }).populate('recruiter');
+      interviews = await prisma.interview.findMany({
+        where: { interviewerId: req.user.id },
+        include: { recruiter: true }
+      });
     } else {
       return res.status(403).json({ message: 'Not authorized' });
     }
@@ -70,9 +96,14 @@ router.get('/', auth, async (req, res) => {
 // Get a specific interview by ID
 router.get('/:id', auth, async (req, res) => {
   try {
-    const interview = await Interview.findById(req.params.id)
-      .populate('recruiter')
-      .populate('interviewer');
+    const interview = await prisma.interview.findUnique({
+      where: { id: req.params.id },
+      include: {
+        recruiter: true,
+        interviewer: true,
+        feedback: true
+      }
+    });
     
     if (!interview) {
       return res.status(404).json({ message: 'Interview not found' });
@@ -80,9 +111,9 @@ router.get('/:id', auth, async (req, res) => {
     
     // Check if user has permission to view this interview
     if (
-      req.user.role !== 'admin' && 
-      interview.recruiter._id.toString() !== req.user._id.toString() && 
-      (interview.interviewer && interview.interviewer._id.toString() !== req.user._id.toString())
+      req.user.role !== 'ADMIN' && 
+      interview.recruiterId !== req.user.id && 
+      (interview.interviewerId && interview.interviewerId !== req.user.id)
     ) {
       return res.status(403).json({ message: 'Not authorized' });
     }
@@ -96,21 +127,23 @@ router.get('/:id', auth, async (req, res) => {
 // Update an interview
 router.patch('/:id', auth, async (req, res) => {
   try {
-    const interview = await Interview.findById(req.params.id);
+    const interview = await prisma.interview.findUnique({
+      where: { id: req.params.id }
+    });
     
     if (!interview) {
       return res.status(404).json({ message: 'Interview not found' });
     }
     
     // Check permissions based on role
-    if (req.user.role === 'admin') {
+    if (req.user.role === 'ADMIN') {
       // Admin can update any interview
-    } else if (req.user.role === 'recruiter' && interview.recruiter.toString() === req.user._id.toString()) {
+    } else if (req.user.role === 'RECRUITER' && interview.recruiterId === req.user.id) {
       // Recruiter can update their own interviews
-    } else if (req.user.role === 'interviewer' && interview.interviewer && interview.interviewer.toString() === req.user._id.toString()) {
+    } else if (req.user.role === 'INTERVIEWER' && interview.interviewerId === req.user.id) {
       // Interviewer can update interviews assigned to them
       // But limit what they can update
-      const allowedUpdates = ['status', 'feedback', 'rating'];
+      const allowedUpdates = ['status', 'feedback'];
       const updates = Object.keys(req.body);
       const isValidOperation = updates.every(update => allowedUpdates.includes(update));
       
@@ -122,12 +155,17 @@ router.patch('/:id', auth, async (req, res) => {
     }
     
     // Update the interview
-    Object.keys(req.body).forEach(update => {
-      interview[update] = req.body[update];
+    const updatedInterview = await prisma.interview.update({
+      where: { id: req.params.id },
+      data: req.body,
+      include: {
+        recruiter: true,
+        interviewer: true,
+        feedback: true
+      }
     });
     
-    await interview.save();
-    res.json(interview);
+    res.json(updatedInterview);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -136,7 +174,9 @@ router.patch('/:id', auth, async (req, res) => {
 // Delete an interview (admin and recruiter only)
 router.delete('/:id', auth, async (req, res) => {
   try {
-    const interview = await Interview.findById(req.params.id);
+    const interview = await prisma.interview.findUnique({
+      where: { id: req.params.id }
+    });
     
     if (!interview) {
       return res.status(404).json({ message: 'Interview not found' });
@@ -144,13 +184,24 @@ router.delete('/:id', auth, async (req, res) => {
     
     // Only admin or the recruiter who created the interview can delete it
     if (
-      req.user.role !== 'admin' && 
-      (req.user.role !== 'recruiter' || interview.recruiter.toString() !== req.user._id.toString())
+      req.user.role !== 'ADMIN' && 
+      (req.user.role !== 'RECRUITER' || interview.recruiterId !== req.user.id)
     ) {
       return res.status(403).json({ message: 'Not authorized' });
     }
     
-    await interview.remove();
+    // Delete associated feedback if exists
+    if (interview.feedback) {
+      await prisma.feedback.delete({
+        where: { interviewId: interview.id }
+      });
+    }
+    
+    // Delete the interview
+    await prisma.interview.delete({
+      where: { id: req.params.id }
+    });
+    
     res.json({ message: 'Interview deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
