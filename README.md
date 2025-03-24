@@ -1,4 +1,4 @@
-# IntervIU To Implement
+# IntervU To Implement
 Backend (BE) Tools
 Database Tools
 Authentication (AUTH)

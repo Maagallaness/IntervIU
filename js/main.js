@@ -1,4 +1,4 @@
-// Main JavaScript file for IntervIU landing page
+// Main JavaScript file for IntervU landing page
 
 document.addEventListener('DOMContentLoaded', function() {
     // Smooth scrolling for anchor links

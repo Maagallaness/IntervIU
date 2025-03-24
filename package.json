@@ -1,7 +1,7 @@
 {
-  "name": "interviu",
+  "name": "intervu",
   "version": "1.0.0",
-  "description": "IntervIU - Platform for technical interviews",
+  "description": "IntervU - Platform for technical interviews",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",

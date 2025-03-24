@@ -27,7 +27,7 @@ app.use('/api/interviews', interviewRoutes);
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('Welcome to IntervIU API');
+  res.send('Welcome to IntervU API');
 });
 
 // Error handling middleware
