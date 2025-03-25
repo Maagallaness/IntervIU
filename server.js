@@ -25,8 +25,13 @@ app.use(express.static('public'));
 app.use('/api/users', userRoutes);
 app.use('/api/interviews', interviewRoutes);
 
-// Root route
+// Root route - redirect to login page
 app.get('/', (req, res) => {
+  res.redirect('/login.html');
+});
+
+// API welcome route
+app.get('/api', (req, res) => {
   res.send('Welcome to IntervU API');
 });
 

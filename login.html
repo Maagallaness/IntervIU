@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IntervU - Iniciar Sesión</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <!-- FirebaseUI -->
+    <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="index.html">IntervU</a>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link" data-i18n="nav.home">Inicio</a>
+                <a href="#" class="nav-link active" data-i18n="nav.login">Iniciar sesión</a>
+                <a href="#" class="nav-link" data-i18n="nav.contact">Contacto</a>
+                <div class="language-selector">
+                    <span class="globe-icon"><i class="fas fa-globe"></i></span>
+                    <a href="#" class="active" data-lang="es">ES</a>
+                    <a href="#" data-lang="en">EN</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="auth-container">
+            <h2 data-i18n="auth.login">Iniciar Sesión</h2>
+            
+            <!-- Email/Password Login Form -->
+            <div class="auth-form">
+                <form id="email-login-form">
+                    <div class="form-group">
+                        <label for="email" data-i18n="auth.email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" required data-i18n-attr="placeholder:auth.email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password" data-i18n="auth.password">Contraseña</label>
+                        <input type="password" id="password" name="password" required data-i18n-attr="placeholder:auth.password">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-i18n="auth.signIn">Iniciar sesión</button>
+                        <a href="#" id="forgot-password" data-i18n="auth.forgotPassword">¿Olvidaste tu contraseña?</a>
+                    </div>
+                </form>
+                <div class="auth-divider">
+                    <span data-i18n="auth.or">o</span>
+                </div>
+                <div class="register-link">
+                    <p>
+                        <span data-i18n="auth.noAccount">¿No tienes una cuenta?</span>
+                        <a href="#" id="show-register" data-i18n="auth.createAccount">Crear cuenta</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Registration Form (initially hidden) -->
+            <div class="auth-form" id="register-form" style="display: none;">
+                <form id="email-register-form">
+                    <div class="form-group">
+                        <label for="register-email" data-i18n="auth.email">Correo electrónico</label>
+                        <input type="email" id="register-email" name="email" required data-i18n-attr="placeholder:auth.email">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password" data-i18n="auth.password">Contraseña</label>
+                        <input type="password" id="register-password" name="password" required data-i18n-attr="placeholder:auth.password">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password" data-i18n="auth.confirmPassword">Confirmar contraseña</label>
+                        <input type="password" id="confirm-password" name="confirm-password" required data-i18n-attr="placeholder:auth.confirmPassword">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" data-i18n="auth.register">Registrarse</button>
+                    </div>
+                </form>
+                <div class="register-link">
+                    <p>
+                        <span data-i18n="auth.haveAccount">¿Ya tienes una cuenta?</span>
+                        <a href="#" id="show-login" data-i18n="auth.signIn">Iniciar sesión</a>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Or continue as guest -->
+            <div class="guest-login">
+                <button id="guest-login-btn" class="btn btn-secondary" data-i18n="auth.guest">Continuar como invitado</button>
+            </div>
+            
+            <!-- Original Firebase UI container (will be hidden by default) -->
+            <div id="firebaseui-auth-container" style="display: none;"></div>
+            <div id="loader" data-i18n="auth.loading">Cargando...</div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h2>IntervU</h2>
+                <p>Entrevistas técnicas sin complicaciones</p>
+            </div>
+            <div class="footer-links">
+                <h3>Enlaces</h3>
+                <ul>
+                    <li><a href="index.html">Inicio</a></li>
+                    <li><a href="#">Sobre nosotros</a></li>
+                    <li><a href="#">Contacto</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h3>Síguenos</h3>
+                <div class="social-icons">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 IntervU. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Translation Script -->
+    <script src="js/translations.js"></script>
+    <!-- Firebase Authentication Script -->
+    <script src="js/auth.js"></script>
+</body>
+</html>

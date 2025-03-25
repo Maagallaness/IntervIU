@@ -26,15 +26,20 @@ document.addEventListener('DOMContentLoaded', function() {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             
-            // Remove active class from all language links
-            languageLinks.forEach(l => l.classList.remove('active'));
+            // Get the language code from the data-lang attribute
+            const lang = this.getAttribute('data-lang');
+            if (!lang) return;
             
-            // Add active class to clicked link
-            this.classList.add('active');
-            
-            // Here you would implement actual language switching logic
-            // For now, just a placeholder
-            console.log('Language switched to:', this.textContent);
-        });
-    });
-});
+            // Set the language using the i18n function
+            if (window.i18n && window.i18n.setLanguage) {
+                const success = window.i18n.setLanguage(lang);
+                
+                if (success) {
+                    // Remove active class from all language links
+                    languageLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    console.log('Language switched to:', lang);
+                }
