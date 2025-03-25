@@ -1,6 +1,18 @@
 // Main JavaScript file for IntervU landing page
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication state
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    const homeLink = document.getElementById('home-link');
+    const loginLink = document.getElementById('login-link');
+    
+    if (isAuthenticated) {
+        if (homeLink) homeLink.style.display = 'block';
+        if (loginLink) loginLink.style.display = 'none';
+    } else {
+        if (homeLink) homeLink.style.display = 'none';
+        if (loginLink) loginLink.style.display = 'block';
+    }
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

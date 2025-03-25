@@ -4,12 +4,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // Firebase configuration
   // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "AIzaSyDOCAbC123dEf456GhI789jKl01-MnO",  // Replace with your Firebase API Key
-    authDomain: "intervu-app.firebaseapp.com",      // Replace with your Firebase Auth Domain
-    projectId: "intervu-app",                       // Replace with your Firebase Project ID
-    storageBucket: "intervu-app.appspot.com",      // Replace with your Firebase Storage Bucket
-    messagingSenderId: "123456789012",             // Replace with your Firebase Messaging Sender ID
-    appId: "1:123456789012:web:a1b2c3d4e5f6g7h8i9j0", // Replace with your Firebase App ID
+    apiKey: "AIzaSyBZH3p4yjo8yKE9k7PeWeDBYsM5l_X3lL8",
+    authDomain: "intervu-app-7f3b2.firebaseapp.com",
+    projectId: "intervu-app-7f3b2",
+    storageBucket: "intervu-app-7f3b2.appspot.com",
+    messagingSenderId: "654321098765",
+    appId: "1:654321098765:web:abcdef123456789"
   };
 
   // Initialize Firebase
